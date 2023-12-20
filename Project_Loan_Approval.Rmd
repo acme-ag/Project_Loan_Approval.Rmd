@@ -1,0 +1,618 @@
+---
+title: "Project"
+author: "Alex"
+date: "2023-11-22"
+output: word_document
+---
+
+https://www.kaggle.com/datasets/architsharma01/loan-approval-prediction-dataset/data
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+What to research:
+
+Correlation: - Self employment / status - Income / loan amount / loan status (check if possible) - Credit score -- what factors it depends on the most - Most important factors for getting loan in descending order - Education / Loan approval status correlation
+
+-   Estimations, predictions about getting/not getting the loan (linear reg)
+-   grouping of graduates & not graduates, or self employed or not : Based on either : we can calculate Loan amount Confidence intervals, or credit score
+-   Hypothesis grads get more loan amount (corr not applicable)
+-   Based on approved and rejected loan status we can make null and alternative hypotheses, when credit score is \>600\< =.
+-   WP: Predict the loan amount based ob the income and degree (multiple linear regression (or logistic regression?))
+
+```{r}
+library(readr)
+loan_approval <- read_csv("loan_approval_dataset.csv")
+print(loan_approval)
+View(loan_approval)
+
+```
+
+# 1. Exploratory analysis
+
+First, we'll make a brief overview to get the idea of the dataset we work with.
+
+### Categorical data
+
+Education values distribution
+
+```{r}
+freq = table(loan_approval$education)
+r_freq = round(freq/nrow(loan_approval), digits = 2)
+p_freq = round(r_freq*100, digits = 2)
+
+cbind(freq, r_freq, p_freq)
+
+barplot(freq, col=c("black", "orange"), main = "Education distribution")
+```
+
+Self employment values distribution
+
+```{r}
+freq = table(loan_approval$self_employed)
+r_freq = round(freq/nrow(loan_approval), digits = 2)
+p_freq = round(r_freq*100, digits = 2)
+
+cbind(freq, r_freq, p_freq)
+barplot(freq, main = "Self employed distribution", col=c("black", "orange"))
+```
+
+Loan approval values distribution
+
+```{r}
+freq = table(loan_approval$loan_status)
+r_freq = round(freq/nrow(loan_approval), digits = 2)
+p_freq = round(r_freq*100, digits = 2)
+
+cbind(freq, r_freq, p_freq)
+barplot(freq, main = "Loan status distribution", col=c("black", "orange"))
+
+```
+
+### Numerical data
+
+Number of dependents
+
+```{r}
+freq = table(loan_approval$no_of_dependents)
+r_freq = round(freq/nrow(loan_approval), digits = 2)
+p_freq = round(r_freq*100, digits = 2)
+
+cbind(freq, r_freq, p_freq)
+```
+
+```{r}
+a = barplot(freq, main="Number of dependents", ylim = c(0, max(freq)+50))
+abline(h=0)
+text(a, freq - 100, labels = freq, pos = 3, cex = 0.8, col = "black")
+
+boxplot(freq, main="Number of dependents", horizontal = T, col = "orange")
+```
+
+Income amount
+
+```{r}
+# options(scipen = 999)
+
+df = loan_approval$income_annum/1000 # In thousands
+cbind(summary(df))
+bins = seq(0, 10000, 500) # split into 20 bins with step of 500 (thousand)
+
+data = cut(df, bins)
+
+freq = table(data)
+cbind(freq)
+
+# barplot(freq, xlab = "Income", ylab="Frequency of incomes", main = "Annual income distribution", names.arg = c("200-700", "700-1200", "1200-1700", "1700-2200", "2200-2700", "2700-3200", "3200-3700", "3700-4200", "4200-4700", "4700-5200", "5200-5700", "5700-6200", "6200-6700", "6700-7200", "7200-7700", "7700-8200", "8200-8700", "8700-9200", "9200-9700", "9700-10200"), las=2)
+
+hist(df, breaks = bins, xlab = "Income", ylab = "Frequency of incomes", main = "Annual income distribution (in thousands)", axes = FALSE)
+axis(side = 1, at = bins, labels = bins, las = 2)
+axis(side = 2)
+
+# text(bins, freq, labels = freq, cex = 0.8, pos = 2, offset = -1.3, col = "black")
+```
+
+Loan amount
+
+```{r}
+df = loan_approval$loan_amount/1000
+
+cbind(summary(df))
+
+bins = seq(0, 40000, 2000) # split into 20 bins with step of 2000 (thousand)
+data = cut(df, bins)
+
+freq = table(data)
+cbind(freq)
+
+
+hist(df, breaks = bins, xlab = "Loan amount", ylab = "Frequency of loan amounts", main = "Loan amount distribution (in thousands)", axes = FALSE)
+axis(side = 1, at = bins, labels = bins, las = 2)
+axis(side = 2)
+```
+
+Loan term
+
+```{r}
+df = loan_approval$loan_term
+
+cbind(summary(df))
+
+freq = table(df)
+cbind(freq)
+
+a = barplot(freq, main="Loan term distribution", ylim = c(0, max(freq)+50), xlab = "Loan term", ylab = "Frequency")
+abline(h=0)
+text(a, freq - 100, labels = freq, pos = 3, cex = 0.8, col = "black")
+```
+
+Cibil score
+
+```{r}
+df = loan_approval$cibil_score
+
+cbind(summary(df))
+
+bins = seq(300, 900, 30) # split into 20 bins with step of 30
+data = cut(df, bins)
+
+freq = table(data)
+cbind(freq)
+
+hist(df, breaks = bins, xlab = "CIBIL score range", ylab = "Frequency of CIBIL score", main = "Distribution od CIBIL scores", axes = FALSE)
+axis(side = 1, at = bins, labels = bins, las = 2)
+axis(side = 2)
+```
+
+Residential assets value
+
+```{r}
+df = loan_approval$residential_assets_value/1000
+cbind(summary(df))
+bins = seq(-500, 30000, 500) # split into 61 bins with step of 500 (thousand) just to display the negative assets
+
+data = cut(df, bins)
+
+freq = table(data)
+data.frame(freq) # cbind returns a too long column
+
+
+hist(df, breaks = bins, xlab = "Res. assets value in thousands", ylab = "Frequency of values", main = "Res. assets values distribution", axes = FALSE)
+axis(side = 1, at = bins, labels = bins, las = 2)
+axis(side = 2)
+```
+
+Commercial assets value
+
+```{r}
+df = loan_approval$commercial_assets_value/1000
+cbind(summary(df))
+bins = seq(0, 20000, 1000) # split into 20 bins with step of 1000 (thousand)
+
+data = cut(df, bins)
+
+freq = table(data)
+data.frame(freq)
+
+hist(df, breaks = bins, xlab = "Comm. assets value in thousands", ylab = "Frequency of values", main = "Comm. assets values distribution", axes = FALSE)
+axis(side = 1, at = bins, labels = bins, las = 2)
+axis(side = 2)
+```
+
+Luxury assets value
+
+```{r}
+df = loan_approval$luxury_assets_value/1000
+cbind(summary(df))
+bins = seq(0, 40000, 2000) # split into 20 bins with step of 2000 (thousand)
+
+data = cut(df, bins)
+
+freq = table(data)
+data.frame(freq)
+
+hist(df, breaks = bins, xlab = "Lux. assets value in thousands", ylab = "Frequency of values", main = "Lux. assets values distribution", axes = FALSE)
+axis(side = 1, at = bins, labels = bins, las = 2)
+axis(side = 2)
+```
+
+Bank assets value
+
+```{r}
+df = loan_approval$bank_asset_value/1000
+cbind(summary(df))
+
+bins = seq(0, 15000, 1000) # split into 20 bins with step of 1000 (thousand)
+
+data = cut(df, bins)
+
+freq = table(data)
+data.frame(freq)
+
+hist(df, breaks = bins, xlab = "Bank assets value in thousands", ylab = "Frequency of values", main = "Bank assets values distribution", axes = FALSE)
+axis(side = 1, at = bins, labels = bins, las = 2)
+axis(side = 2)
+```
+
+
+
+
+
+------------------------------------------------------------------------
+
+# 2.
+
+### Calculate Self employment / Loan approval status correlation.
+
+Ho: there's no any dependency between these two variables. Ha: there's a dependency between the self employment status and loan approval status. Like th self employed customers have higher chance of getting the loan approved.
+
+1.  Calculate number of Yes and No in Self-employment
+
+```{r}
+Yes=sum(loan_approval$self_employed=="Yes")
+n=length(loan_approval$self_employed)
+
+percent_yes = round((Yes/n)*100, digits = 2)
+percent_no = 100 - percent_yes
+cat("Total Yes:", Yes, percent_yes, "%","\n","Total No:", n-Yes, percent_no, "%")
+```
+
+2.  Calculate the same for Loan Status column
+
+```{r}
+Approved=sum(loan_approval$loan_status=="Approved")
+
+percent_appr = round((Approved/n)*100, digits = 2)
+percent_rej = 100 - percent_appr
+
+
+cat("Approved or Rejected loans:","\n","- Total Approved:", Approved, percent_appr, "%","\n","- Total Rejected:", n-Approved, percent_rej, "%")
+
+```
+
+3.  I want to know how many of self_employed "yes" got loan_status "approved"
+
+```{r}
+
+joint_table = table(loan_approval$self_employed, loan_approval$loan_status)
+rownames(joint_table) = c("Self employed: No", "Self employed: Yes")
+colnames(joint_table) = c("Loan approved", "Loan rejected")
+# joint_table = addmargins(joint_table, margin = 1:2) # coommented out to get meaningful output while performing chi square test, step 5.
+print(joint_table)
+```
+
+There's no correlation between these two.
+
+4.  Plot the chi square
+
+```{r}
+library(ggplot2)
+
+self_loan = table(loan_approval$self_employed, loan_approval$loan_status)
+result = chisq.test(self_loan)
+print(result)
+
+ggplot(as.data.frame(as.table(self_loan)), aes(x = Var1, y = Var2, fill = Freq)) +
+  geom_tile() +
+  scale_fill_gradient(low = "white", high = "blue") +
+  labs(title = "Observed Frequencies Heatmap")
+
+```
+
+5.  Get p-value
+
+```{r}
+chisq.test(joint_table)
+```
+
+p-value = 1, we cannot reject Ho.
+
+### Conclusion: 
+There's no evidence that the Self employment status visibly affects the decision on the loan. The Self-employed customers receive the loan just slightly more than non self-employed.
+
+------------------------------------------------------------------------
+
+# 3.
+
+### Research Income / loan amount / loan status correlation
+
+How do the income and loan amount impact the status?
+
+```{r}
+
+case1 = data.frame(loan_approval[, c("income_annum", "loan_amount", "loan_status")])
+head(case1, 5)
+# tail(case1,5)
+```
+
+```{r}
+n = nrow(case1)
+
+# income stats
+mu_income = mean(case1$income_annum)
+var_income = var(case1$income_annum)
+sd_income = sqrt(var_income)
+
+# loan amount stats
+mu_loan_amount = mean(case1$loan_amount)
+var_loan_amount = var(case1$loan_amount)
+sd_loan_amount = sqrt(var_loan_amount)
+```
+
+Covariance income / loan amount
+
+```{r}
+income_status_cov = cov(case1$income_annum, case1$loan_amount)
+income_status_cov
+```
+
+Correlation coefficient income / loan amt
+
+```{r}
+income_status_cor = cor(case1$income_annum, case1$loan_amount)
+round(income_status_cor, digits = 2)
+```
+
+It looks like there's strong positive correlation between these two variables: the higher the income, the higher the loan amount.
+
+
+
+```{r}
+x = case1$income_annum
+y = case1$loan_amount
+
+# make it easier to display on the plot
+xd = x/1000000
+yd = y/1000000
+```
+
+```{r}
+par(mfrow = c(1, 1), mar = c(5, 5, 1, 2) + 0.1)
+plot(xd, yd, 
+     main = "Correlation Income vs Loan amount and status distribution", 
+     xlab = "Income amt, mil", 
+     ylab = "Loan amt, mil", 
+     col = 'lightblue'
+     )
+
+
+abline(lm(yd ~ xd), col = "red", lwd = 3)
+legend("topleft", legend = "Correlation Line", col = "red", lty = 1, lwd = 3)
+text(paste("Correlation coeff.:", round(cor(x, y), 2)), x = 6, y = 30)
+
+
+xd_approved = xd[case1$loan_status == "Approved"]
+yd_approved = yd[case1$loan_status == "Approved"]
+
+xd_rejected = xd[case1$loan_status == "Rejected"]
+yd_rejected = yd[case1$loan_status == "Rejected"]
+
+points(xd_rejected, yd_rejected, col = 'salmon')
+abline(lm(yd ~ xd), col = "red", lwd = 3)
+
+legend("topright", legend = c("Approved", "Rejected"), col = c("lightblue", "salmon"), pch = 1)
+```
+When annual income increases, the loan amount tends to increase. But the annual income doesn't show an obvious trend with the loan status.
+
+
+### Multi-linear regression part.
+
+
+```{r}
+case1$lstat = ifelse(case1$loan_status == "Approved", 1, 0)
+head(case1, 5)
+```
+
+```{r}
+M2 = glm(lstat ~ loan_amount + income_annum, data = case1, family = "binomial")
+summary(M2)
+```
+
+### Conclusion:
+
+How do the income and loan amount impact the status?
+
+The negative value of the estimate of income indicates of the multicollinearity issue: correlation between income and loan amount is 0.93, which is higher than 0.7.
+
+
+
+Considering this we'll substitute the loan amount variable with another, which hypotheticaly can have impact on the loan status.
+
+```{r}
+case1adj = data.frame(loan_approval[, c("income_annum", "loan_amount", "loan_status", "residential_assets_value", "commercial_assets_value", "luxury_assets_value",  "bank_asset_value", "cibil_score")])
+case1adj$lstat = ifelse(case1adj$loan_status == "Approved", 1, 0)
+head(case1adj, 5)
+```
+```{r}
+case1adj$total = case1adj$residential_assets_value + case1adj$commercial_assets_value + case1adj$luxury_assets_value + case1adj$bank_asset_value
+head(case1adj, 5)
+
+```
+WP: 
+Model 1: It is interesting to see how the loan amount is related to commercial assets and residential assets. I would love to see the definition and differences between two assets, if available. 
+Loan amount vs res assets
+```{r}
+M1_1 = lm(loan_amount~residential_assets_value, case1adj)
+summary(M1_1)
+options(scipen = 999)
+```
+Equation: ybar = 8955162.22430 + 0.82679 * residential_assets_value
+
+Judging by p-value of 0.0000 there's relationship between these variables. For each 1 unit of res. asset value there's 0.8268 units of loan amount. But the r2 coefficient of 0.35 tells that most of data variability can't be described by model.
+
+Now loan amount vs comm assets
+
+```{r}
+M1_2 = lm(loan_amount~commercial_assets_value, case1adj)
+summary(M1_2)
+options(scipen = 999)
+```
+Equation: ybar = 8952539.08836 + 1.24286 * commercial_assets_value
+Here for 1 unit of increase in comm. assets value there's expected increase in loan amount by 1.2429. The p-value is extremely low, so both coeff are significant. Comparing to the residential assent the commercial asset value parameter looks more important. Overall the model is not very good, judjing but r2 = 0.36.
+
+```{r}
+M1_3 = lm(loan_amount~commercial_assets_value+residential_assets_value, case1adj)
+summary(M1_3)
+```
+Equation: ybar = 6398331.20366 + 0.88735  * commercial_assets_value + 0.57841 * residential_assets_value
+
+For each increase by 1 unit in com.assets there's increase in y by 0.8874 in loan (given res. asset remains the same), and increase in y by 0.5784  for each increase by 1 unit in re/assets (given the com.assets remain the same).
+
+Using both variables at once gives a better adj.r2, 0.51 indicating the increased quality of the model.
+
+
+
+```{r}
+correlations = cor(case1adj[, c("income_annum", "loan_amount", "residential_assets_value", "commercial_assets_value", "luxury_assets_value",  "bank_asset_value", "total", "cibil_score")])
+# round(income_total, digits = 2)
+correlations
+```
+How total assets distributed across loan status?
+```{r}
+library(ggplot2)
+# data = cut(df, bins)
+# 
+# freq = table(data)
+# cbind(freq)
+# 
+# 
+# hist(df, breaks = bins, xlab = "Loan amount", ylab = "Frequency of loan amounts", main = "Loan amount distribution (in thousands)", axes = FALSE)
+# axis(side = 1, at = bins, labels = bins, las = 2)
+# axis(side = 2)
+
+
+
+df = data.frame(total = case1adj$total, status = case1adj$loan_status)
+bins = seq(0, 100000000, 5000000)
+condition = rep(c("Approved" , "Rejected") , 3)
+data = table(cut(df$total, bins), df$status)
+head(data, 20)
+
+
+# barplot(x = data)
+# ggplot(df, aes(fill=df$condition, y=df$total, x=df$status)) +
+#     geom_bar(position="dodge", stat="identity"))
+```
+
+
+
+```{r}
+M2adj = glm(lstat ~ income_annum + total, data = case1adj, family = "binomial")
+summary(M2adj)
+```
+
+
+------------------------------------------------------------------------
+
+# 4.
+
+### Hypothesis test: graduated get more loan amount than not graduated
+
+Ho: there's no dependency between these two variables, loan amount is not dependent on the education level. r^2^ = 0 
+
+Ha: customers with degree get loan amount higher than those who do not have a degree. r^2^ \> 0
+
+The purpose of this exercise is to try to find a way to measure dependency between categorical and numerical data.
+
+```{r}
+case2 = data.frame(loan_approval[, c("education", "loan_amount")])
+head(case2, 5)
+```
+ML regression part
+
+```{r}
+case2$elevel = ifelse(case2$education == "Graduate", 1, 0)
+case2
+```
+```{r}
+M3 = lm(loan_amount~elevel, case2)
+summary(M3)
+```
+
+### Conclusion:
+With the R-squared as low as 0.0001 we conclude that there's no correlation or model is not releavant.
+
+#-------------------------------------------------------------------------
+/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\
+Here comes experimental thing:
+point-biserial corr
+
+link: https://stats.stackexchange.com/questions/484299/how-to-check-the-correlation-between-categorical-and-numeric-independent-variabl
+
+```{r}
+library(ltm)
+biserial.cor(df$loan_amount, df$education)
+```
+A value close to -1 indicates a strong negative correlation, while a value near 1 signifies a strong positive correlation.
+The output we have is close to zero. So no correlation.
+
+/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\
+
+
+Consider: https://stats.stackexchange.com/questions/119835/correlation-between-a-nominal-iv-and-a-continuous-dv-variable
+Measure strength of association
+
+Maybe the best approach would be to calc. mean for each group in education
+
+------------------------------------------------------------------------
+
+
+# 5.
+
+Predict the loan amount based on the income and degree (multiple linear regression).
+
+```{r}
+case3 = data.frame(loan_approval[, c("education", "income_annum","loan_amount")])
+head(case3, 5)
+```
+For the final equation to make sense, we will denote the "Graduate" as 0 and "No Graduate" as 1.
+
+```{r}
+case3$elevel = ifelse(case3$education == "Graduate", 0, 1)
+head(case3, 5)
+```
+
+```{r}
+M4 = lm(loan_amount~income_annum+elevel,case3)
+summary(M4)
+```
+
+### Conclusion:
+
+The equation to predict: 14300 + 2.988 * Income + 2729 * Ed
+
+- For every 1 unit increase in income there's increase in loan amount by 2.988. P-level is low so this is a significant parameter.
+- Having a degree adds 2729 to the amount. Education (elevel) is insignificant since the p-level is high.
+
+If a person with a degree and annual income of 4100000 wants to get a loan he can expect to get loan of
+
+14300 + 2.988 * 4100000 + 2729 = 12267829
+
+86% of variance are grouped around the regression line. Thus the model explains it.
+A high F-statistic (1.312e+04) with a very low p-value (< 2.2e-16) suggests that at least one of the predictors (income) is related to the response variable.
+
+But this model has to take into account at least loan term.
+
+
+```{r}
+case4 = data.frame(loan_approval[, c("education", "income_annum","loan_amount", "loan_term")])
+case4$elevel = ifelse(case4$education == "Graduate", 0, 1)
+head(case4, 5)
+```
+```{r}
+M5 = lm(loan_amount~income_annum+elevel+loan_term,case4)
+summary(M5)
+```
+
+Equation:
+52040 + 2.988 * income +3072 * education - 3516 * term
+
+Which means that If the same person with a degree and annual income of 4100000 wants to get a loan for 5 years he can expect to get loan of
+
+52040 + 2.988 * 4100000 + 3072 - 3516 * 12 = 12288332
+
+P-value indicates that the loan term is a stronger factor than education but still not comparable to income amount.
+
+F-statistic with very small p-value means that the model is statistically significant.
+
