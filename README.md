@@ -1,3 +1,7 @@
+The loan approval [dataset](https://www.kaggle.com/datasets/architsharma01/loan-approval-prediction-dataset/data) is a collection of financial records and associated information used to determine the eligibility of individuals or organizations for obtaining loans from a lending institution. 
+
+Here are the dataset columns with description:
+
 <table style="font-family: Arial, sans-serif; font-size: 16px;">
   <tbody><tr>
     <th><b>Attribute</b></th>
@@ -56,6 +60,13 @@
       <td>Target variable. Describes whether the loan was approved or not.</td>
     </tr>
 </tbody></table>
+
+The goal of the project is to practice R and statistical techniques. So, with this in mind we will:
+- Perform exploratory analysis
+- Check the relationship between two categorical variables
+- Test the hypothesis about relationship between categorical and numerical variables
+- Build a prediction model with use of numerical and categorical variables.
+
 
 ```{r}
 library(readr)
@@ -330,6 +341,13 @@ corPlot(correlations,
 ```
 ![tetxtxtx](img/corr-plot.png)
 
+Quick overview inferences:
+
+We can't see the normal distribution of the data in any variable.
+
+There are a lot of correlations between many variables like income and assets or loan amount. Interesting thing is to explore the correlations between not so obviouse vars.
+
+
 ## 2. Calculate Self employment / Loan approval status correlation.
 
 Suppose, we suspect the self employed customers have somewhat higher chances of getting the loan approved.
@@ -577,7 +595,10 @@ F-statistic: 8.75e+03 on 3 and 4265 DF,  p-value: <0.0000000000000002
 Equation:
 
 52040 + 2.988 * income +3072 * education - 3516 * term
+
 Which means that If the same person with a degree and annual income of 4100000 wants to get a loan for 5 years he can expect to get loan of
 52040 + 2.988 * 4100000 + 3072 - 3516 * 12 = 12288332
+
 P-value indicates that the loan term is a stronger factor than education but still not comparable to income amount.
+
 F-statistic with very small p-value means that the model is statistically significant.
