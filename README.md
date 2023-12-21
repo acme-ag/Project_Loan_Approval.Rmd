@@ -466,7 +466,7 @@ F-statistic: 0.482 on 1 and 4267 DF,  p-value: 0.487
 **Conclusion:**
 With the p-value of 0.49, R-squared as low as 0.0001 we conclude that the education is not significant for this model.
 
-## 5. Predict the loan amount based on the income and degree.
+## 4. Predict the loan amount based on the income and degree.
 
 ```{r}
 case3 = data.frame(loan_approval[, c("education", "income_annum","loan_amount")])
