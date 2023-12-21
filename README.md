@@ -64,7 +64,7 @@ First, we'll make a brief overview to get the idea of the dataset we work with.
 ### Categorical data
 
 Education values distribution
-![tetxtxtx](img/1-education.png)
+![tetxtxtx](img/1-education.jpg)
 
 Self-employed values distribution
 ![tetxtxtx](img/2-selfemployed.png)
@@ -75,8 +75,8 @@ Loan status values distribution
 Number of dependants values distribution
 ![tetxtxtx](img/4-nodepend.png)
 
-LLoan term values distribution
-![tetxtxtx](img/5-loanterm.png)
+Loan term values distribution
+![tetxtxtx](img/5-loaterm.png)
 
 Income amount values distribution
 ![tetxtxtx](img/6-income.png)
