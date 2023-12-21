@@ -57,5 +57,48 @@
     </tr>
 </tbody></table>
 
+## 1. Exploratory analysis
 
-![tetxtxtx](img/1.jpg)
+First, we'll make a brief overview to get the idea of the dataset we work with.
+
+### Categorical data
+
+Education values distribution
+![tetxtxtx](img/1-education.png)
+
+Self-employed values distribution
+![tetxtxtx](img/2-selfemployed.png)
+
+Loan status values distribution
+![tetxtxtx](img/3-loanstatus.png)
+
+Number of dependants values distribution
+![tetxtxtx](img/4-nodepend.png)
+
+LLoan term values distribution
+![tetxtxtx](img/5-loanterm.png)
+
+Income amount values distribution
+![tetxtxtx](img/6-income.png)
+
+Loan amount values distribution
+![tetxtxtx](img/7-loanamount.png)
+
+CIBIL score values distribution
+![tetxtxtx](img/8-cibil.png)
+
+Residential assets values distribution
+![tetxtxtx](img/9-resid.png)
+
+Commercial assets values distribution
+![tetxtxtx](img/10-commerc.png)
+
+Luxury assets values distribution
+![tetxtxtx](img/11-lux.png)
+
+Bank assets values distribution
+![tetxtxtx](img/12-bank.png)
+
+
+
+
