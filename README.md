@@ -62,6 +62,15 @@ library(readr)
 loan_approval <- read_csv("loan_approval_dataset.csv")
 print(loan_approval)
 ```
+Top 5 rows:
+
+| loan_id | no_of_dependents | education    | self_employed | income_annum | loan_amount | loan_term | cibil_score | residential_assets_value | commercial_assets_value | luxury_assets_value | bank_asset_value | loan_status |
+|---------|------------------|--------------|---------------|--------------|-------------|-----------|-------------|--------------------------|-------------------------|---------------------|------------------|-------------|
+| 1       | 2                | Graduate     | No            | 9600000      | 29900000    | 12        | 778         | 2400000                  | 17600000                | 22700000            | 8000000          | Approved    |
+| 2       | 0                | Not Graduate | Yes           | 4100000      | 12200000    | 8         | 417         | 2700000                  | 2200000                 | 8800000             | 3300000          | Rejected    |
+| 3       | 3                | Graduate     | No            | 9100000      | 29700000    | 20        | 506         | 7100000                  | 4500000                 | 33300000            | 12800000         | Rejected    |
+| 4       | 3                | Graduate     | No            | 8200000      | 30700000    | 8         | 467         | 18200000                 | 3300000                 | 23300000            | 7900000          | Rejected    |
+| 5       | 5                | Not Graduate | Yes           | 9800000      | 24200000    | 20        | 382         | 12400000                 | 8200000                 | 29400000            | 5000000          | Rejected    |
 
 ## 1. Exploratory analysis
 
@@ -119,6 +128,14 @@ p_freq = round(r_freq*100, digits = 2)
 
 cbind(freq, r_freq, p_freq)
 ```
+|   | freq | r_freq | p_freq |
+|---|------|--------|--------|
+| 0 | 712  | 0.17   | 17     |
+| 1 | 697  | 0.16   | 16     |
+| 2 | 708  | 0.17   | 17     |
+| 3 | 727  | 0.17   | 17     |
+| 4 | 752  | 0.18   | 18     |
+| 5 | 673  | 0.16   | 16     |
 
 ```{r}
 a = barplot(freq, main="Number of dependents", ylim = c(0, max(freq)+50), col=c("lightgray", "gray"))
@@ -276,5 +293,22 @@ axis(side = 2)
 ![tetxtxtx](img/12-bank.png)
 
 
+Table of correlations, correlation plot
+
+```{r}
+correlations = cor(loan_approval[, c("no_of_dependents", "loan_term", "income_annum", "loan_amount", "residential_assets_value", "commercial_assets_value", "luxury_assets_value",  "bank_asset_value", "cibil_score")])
+round(correlations, digits = 4)
+```
 
 
+|                          | no_of_dependents | loan_term | income_annum | loan_amount | residential_assets_value | commercial_assets_value | luxury_assets_value | bank_asset_value | cibil_score |
+|--------------------------|------------------|-----------|--------------|-------------|--------------------------|-------------------------|---------------------|------------------|-------------|
+| no_of_dependents         | 1.00             | -0.02     | 0.01         | 0.00        | 0.01                     | 0.00                    | 0.00                | 0.01             | -0.01       |
+| loan_term                | -0.02            | 1.00      | 0.01         | 0.01        | 0.01                     | -0.01                   | 0.01                | 0.02             | 0.01        |
+| income_annum             | 0.01             | 0.01      | 1.00         | 0.93        | 0.64                     | 0.64                    | 0.93                | 0.85             | -0.02       |
+| loan_amount              | 0.00             | 0.01      | 0.93         | 1.00        | 0.59                     | 0.60                    | 0.86                | 0.79             | -0.02       |
+| residential_assets_value | 0.01             | 0.01      | 0.64         | 0.59        | 1.00                     | 0.41                    | 0.59                | 0.53             | -0.02       |
+| commercial_assets_value  | 0.00             | -0.01     | 0.64         | 0.60        | 0.41                     | 1.00                    | 0.59                | 0.55             | 0.00        |
+| luxury_assets_value      | 0.00             | 0.01      | 0.93         | 0.86        | 0.59                     | 0.59                    | 1.00                | 0.79             | -0.03       |
+| bank_asset_value         | 0.01             | 0.02      | 0.85         | 0.79        | 0.53                     | 0.55                    | 0.79                | 1.00             | -0.02       |
+| cibil_score              | -0.01            | 0.01      | -0.02        | -0.02       | -0.02                    | 0.00                    | -0.03               | -0.02            | 1.00        |
