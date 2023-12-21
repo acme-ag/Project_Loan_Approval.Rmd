@@ -312,3 +312,21 @@ round(correlations, digits = 4)
 | luxury_assets_value      | 0.00             | 0.01      | 0.93         | 0.86        | 0.59                     | 0.59                    | 1.00                | 0.79             | -0.03       |
 | bank_asset_value         | 0.01             | 0.02      | 0.85         | 0.79        | 0.53                     | 0.55                    | 0.79                | 1.00             | -0.02       |
 | cibil_score              | -0.01            | 0.01      | -0.02        | -0.02       | -0.02                    | 0.00                    | -0.03               | -0.02            | 1.00        |
+
+Now, the correlation plot
+
+```{r}
+library(psych)
+gr = colorRampPalette(c('orange', 'black'))
+
+corPlot(correlations,
+        n =10,
+        cex = 0.7,
+        zlim = c(-0.1,1),
+        upper = FALSE,
+        xlas = 2,
+        cex.axis = 0.7,
+        gr = gr)
+```
+![tetxtxtx](img/corr-plot.png)
+
