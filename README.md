@@ -345,7 +345,7 @@ Quick overview inferences:
 
 We can't see the normal distribution of the data in any variable.
 
-There are a lot of correlations between many variables like income and assets or loan amount. Interesting thing is to explore the correlations between not so obviouse vars.
+There are a lot of correlations between many variables like income and assets or loan amount. But mostly these things are more or less expected: the more income a person has the more things they have like luxury or properties, or bank assets. And more likely a person with a higher income will get the loan approved. Interesting thing is to explore the correlations between not so obviouse vars, and make models involving the categorical variables. Like what role does the education has here? Does it make any impact on the decision to approve or not the loan? On amount? And self-employment - is it a positive factor or a factor of risk?
 
 
 ## 2. Calculate Self employment / Loan approval status correlation.
