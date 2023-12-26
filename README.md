@@ -246,6 +246,42 @@ axis(side = 1, at = bins, labels = bins, las = 2)
 axis(side = 2)
 ```
 
+Check for outliers
+
+```{r}
+summary(loan_approval$residential_assets_value)
+```
+
+| Min.  1st Qu.   Median     Mean       | rd Qu.     Max. |
+|---------------------------------------|-----------------|
+| -100000  2200000  5600000  7472617 11 | 00000 29100000  |
+
+
+```{r}
+outliers_data = loan_approval$residential_assets_value
+Q1 = quantile(outliers_data, 0.25)
+Q3 = quantile(outliers_data, 0.75)
+IQR_value = IQR(outliers_data)
+
+lower_limit = Q1 - 1.5 * IQR_value
+upper_limit = Q3 + 1.5 * IQR_value
+
+outliers = outliers_data < lower_limit | outliers_data > upper_limit
+
+table(outliers)
+```
+We have 52 outliers of 4269 records. Here're top 5 records with outliers in residential assets:
+| loan_id <dbl> | no_of_dependents <dbl> | education <chr> | self_employed <chr> | income_annum <dbl> | loan_amount <dbl> | loan_term <dbl> | cibil_score <dbl> | residential_assets_value <dbl> | commercial_assets_value <dbl> | luxury_assets_value <dbl> | bank_asset_value <dbl> | loan_status <chr> |
+|---------------|------------------------|-----------------|---------------------|--------------------|-------------------|-----------------|-------------------|--------------------------------|-------------------------------|---------------------------|------------------------|-------------------|
+| 83            | 2                      | Not Graduate    | Yes                 | 9900000            | 21200000          | 16              | 363               | 25500000                       | 11400000                      | 26600000                  | 6800000                | Rejected          |
+| 99            | 4                      | Graduate        | No                  | 9400000            | 29400000          | 12              | 562               | 25900000                       | 15200000                      | 36400000                  | 7100000                | Approved          |
+| 124           | 0                      | Not Graduate    | Yes                 | 9000000            | 18700000          | 18              | 865               | 26800000                       | 0                             | 20900000                  | 11300000               | Approved          |
+| 229           | 1                      | Not Graduate    | Yes                 | 8700000            | 27000000          | 10              | 717               | 25500000                       | 8600000                       | 17500000                  | 9100000                | Approved          |
+| 263           | 3                      | Graduate        | No                  | 9200000            | 34300000          | 18              | 523               | 25600000                       | 4000000                       | 29100000                  | 8800000                | Rejected          |
+
+
+Same thing will do with other assets. We have some outliers in bank and comm. assets but nothing serious, no errors, looks normal.
+
 ![tetxtxtx](img/9-resid.png)
 
 10. Commercial assets values distribution
